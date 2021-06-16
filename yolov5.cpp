@@ -44,7 +44,7 @@ namespace nvinfer1
         }
     }
 
-    ICudaEngine *build_engine(unsigned int maxBatchSize, IBuilder *builder, IBuilderConfig *config, DataType dt, float &gd, float &gw, std::string &wts_name)
+    ICudaEngine *build_engine(unsigned int maxBatchSize, IBuilder *builder, DataType dt, float &gd, float &gw, std::string &wts_name)
     {
         INetworkDefinition *network = builder->createNetworkV2(0U);
 
@@ -233,18 +233,12 @@ namespace nvinfer1
     {
         // Create builder
         IBuilder *builder = createInferBuilder(gLogger);
-        IBuilderConfig *config = builder->createBuilderConfig();
 
         // Create model to populate the network, then set the outputs and create an engine
         ICudaEngine *engine = nullptr;
-        if (is_p6)
-        {
-            engine = build_engine_p6(maxBatchSize, builder, config, DataType::kFLOAT, gd, gw, wts_name);
-        }
-        else
-        {
-            engine = build_engine(maxBatchSize, builder, config, DataType::kFLOAT, gd, gw, wts_name);
-        }
+        
+        engine = build_engine(maxBatchSize, builder, DataType::kFLOAT, gd, gw, wts_name);
+        
         assert(engine != nullptr);
 
         // Serialize the engine
@@ -253,7 +247,6 @@ namespace nvinfer1
         // Close everything down
         engine->destroy();
         builder->destroy();
-        config->destroy();
     }
 
     void doInference(IExecutionContext &context, cudaStream_t &stream, void **buffers, float *input, float *output, int batchSize)
