@@ -31,7 +31,7 @@ namespace Yolo
 
 namespace nvinfer1
 {
-    class YoloLayerPlugin : public IPluginV2IOExt
+    class YoloLayerPlugin : public IPluginV2
     {
     public:
         YoloLayerPlugin(int classCount, int netWidth, int netHeight, int maxOut, const std::vector<Yolo::YoloKernel>& vYoloKernel);
@@ -44,7 +44,9 @@ namespace nvinfer1
         }
 
         Dims getOutputDimensions(int index, const Dims* inputs, int nbInputDims) override;
-
+        
+       
+        //configureWithFormat
         int initialize() override;
 
         virtual void terminate() override {};
@@ -57,6 +59,7 @@ namespace nvinfer1
 
         virtual void serialize(void* buffer) const override;
 
+        //Bura yok supportFormat var benzer
         bool supportsFormatCombination(int pos, const PluginTensorDesc* inOut, int nbInputs, int nbOutputs) const override {
             return inOut[pos].format == TensorFormat::kLINEAR && inOut[pos].type == DataType::kFLOAT;
         }
@@ -67,12 +70,14 @@ namespace nvinfer1
 
         void destroy() override;
 
-        IPluginV2IOExt* clone() const override;
+        IPluginV2* clone() const override;
 
         void setPluginNamespace(const char* pluginNamespace) override;
 
         const char* getPluginNamespace() const override;
+        
 
+        //Buranin alti yok
         DataType getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const override;
 
         bool isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const override;
@@ -112,9 +117,9 @@ namespace nvinfer1
 
         const PluginFieldCollection* getFieldNames() override;
 
-        IPluginV2IOExt* createPlugin(const char* name, const PluginFieldCollection* fc) override;
+        IPluginV2* createPlugin(const char* name, const PluginFieldCollection* fc) override;
 
-        IPluginV2IOExt* deserializePlugin(const char* name, const void* serialData, size_t serialLength) override;
+        IPluginV2* deserializePlugin(const char* name, const void* serialData, size_t serialLength) override;
 
         void setPluginNamespace(const char* libNamespace) override
         {

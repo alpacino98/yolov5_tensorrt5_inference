@@ -170,7 +170,7 @@ namespace nvinfer1
     }
 
     // Clone the plugin
-    IPluginV2IOExt* YoloLayerPlugin::clone() const
+    IPluginV2* YoloLayerPlugin::clone() const
     {
         YoloLayerPlugin* p = new YoloLayerPlugin(mClassCount, mYoloV5NetWidth, mYoloV5NetHeight, mMaxOutObject, mYoloKernel);
         p->setPluginNamespace(mPluginNamespace);
@@ -284,7 +284,7 @@ namespace nvinfer1
         return &mFC;
     }
 
-    IPluginV2IOExt* YoloPluginCreator::createPlugin(const char* name, const PluginFieldCollection* fc)
+    IPluginV2* YoloPluginCreator::createPlugin(const char* name, const PluginFieldCollection* fc)
     {
         assert(fc->nbFields == 2);
         assert(strcmp(fc->fields[0].name, "netinfo") == 0);
@@ -301,7 +301,7 @@ namespace nvinfer1
         return obj;
     }
 
-    IPluginV2IOExt* YoloPluginCreator::deserializePlugin(const char* name, const void* serialData, size_t serialLength)
+    IPluginV2* YoloPluginCreator::deserializePlugin(const char* name, const void* serialData, size_t serialLength)
     {
         // This object will be deleted when the network is destroyed, which will
         // call YoloLayerPlugin::destroy()
