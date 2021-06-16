@@ -108,13 +108,12 @@ namespace nvinfer1
 
         // Build engine
         builder->setMaxBatchSize(maxBatchSize);
-        config->setMaxWorkspaceSize(16 * (1 << 20)); // 16MB
-#if defined(USE_FP16)
-        config->setFlag(BuilderFlag::kFP16);
-#endif
+        builder->setMaxWorkspaceSize(16 * (1 << 20)); // 16MB
+        if (builder->platformHasFastFp16())
+            builder->setFp16Mode(true);
 
         std::cout << "Building engine, please wait for a while..." << std::endl;
-        ICudaEngine *engine = builder->buildEngineWithConfig(*network, *config);
+        ICudaEngine *engine = builder->buildCudaEngine(*network);
         std::cout << "Build engine successfully!" << std::endl;
 
         // Don't need the network any more
@@ -128,7 +127,7 @@ namespace nvinfer1
 
         return engine;
     }
-
+/*
     ICudaEngine *build_engine_p6(unsigned int maxBatchSize, IBuilder *builder, IBuilderConfig *config, DataType dt, float &gd, float &gw, std::string &wts_name)
     {
         INetworkDefinition *network = builder->createNetworkV2(0U);
@@ -139,7 +138,7 @@ namespace nvinfer1
 
         std::map<std::string, Weights> weightMap = loadWeights(wts_name);
 
-        /* ------ yolov5 backbone------ */
+        // ------ yolov5 backbone------ 
         auto focus0 = focus(network, weightMap, *data, 3, get_width(64, gw), 3, "model.0");
         auto conv1 = convBlock(network, weightMap, *focus0->getOutput(0), get_width(128, gw), 3, 2, 1, "model.1");
         auto c3_2 = C3(network, weightMap, *conv1->getOutput(0), get_width(128, gw), get_width(128, gw), get_depth(3, gd), true, 1, 0.5, "model.2");
@@ -153,7 +152,7 @@ namespace nvinfer1
         auto spp10 = SPP(network, weightMap, *conv9->getOutput(0), get_width(1024, gw), get_width(1024, gw), 3, 5, 7, "model.10");
         auto c3_11 = C3(network, weightMap, *spp10->getOutput(0), get_width(1024, gw), get_width(1024, gw), get_depth(3, gd), false, 1, 0.5, "model.11");
 
-        /* ------ yolov5 head ------ */
+        // ------ yolov5 head ------ 
         auto conv12 = convBlock(network, weightMap, *c3_11->getOutput(0), get_width(768, gw), 1, 1, 1, "model.12");
         auto upsample13 = network->addResize(*conv12->getOutput(0));
         assert(upsample13);
@@ -196,7 +195,7 @@ namespace nvinfer1
         auto cat31 = network->addConcatenation(inputTensors31, 2);
         auto c3_32 = C3(network, weightMap, *cat31->getOutput(0), get_width(2048, gw), get_width(1024, gw), get_depth(3, gd), false, 1, 0.5, "model.32");
 
-        /* ------ detect ------ */
+        // ------ detect ------ 
         IConvolutionLayer *det0 = network->addConvolution(*c3_23->getOutput(0), 3 * (Yolo::CLASS_NUM + 5), DimsHW{1, 1}, weightMap["model.33.m.0.weight"], weightMap["model.33.m.0.bias"]);
         IConvolutionLayer *det1 = network->addConvolution(*c3_26->getOutput(0), 3 * (Yolo::CLASS_NUM + 5), DimsHW{1, 1}, weightMap["model.33.m.1.weight"], weightMap["model.33.m.1.bias"]);
         IConvolutionLayer *det2 = network->addConvolution(*c3_29->getOutput(0), 3 * (Yolo::CLASS_NUM + 5), DimsHW{1, 1}, weightMap["model.33.m.2.weight"], weightMap["model.33.m.2.bias"]);
@@ -228,6 +227,7 @@ namespace nvinfer1
 
         return engine;
     }
+*/
 
     void APIToModel(unsigned int maxBatchSize, IHostMemory **modelStream, bool &is_p6, float &gd, float &gw, std::string &wts_name)
     {
