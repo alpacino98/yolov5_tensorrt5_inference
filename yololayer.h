@@ -63,6 +63,9 @@ namespace nvinfer1
             return format == nvinfer1::PluginFormat::kNCHW && type == nvinfer1::DataType::kFLOAT;
         }
 
+        void configureWithFormat(const nvinfer1::Dims *inputDims,int 	nbInputs,const nvinfer1::Dims *outputDims,
+                                    int nbOutputs,nvinfer1::DataType type,nvinfer1::PluginFormat format,int maxBatchSize) override;
+
         const char* getPluginType() const override;
 
         const char* getPluginVersion() const override;
