@@ -159,7 +159,7 @@ IScaleLayer* addBatchNorm2d(INetworkDefinition *network, std::map<std::string, W
 ILayer* convBlock(INetworkDefinition *network, std::map<std::string, Weights>& weightMap, ITensor& input, int outch, int ksize, int s, int g, std::string lname) {
     Weights emptywts{ DataType::kFLOAT, nullptr, 0 };
     int p = ksize / 2;
-    IConvolutionLayer* conv1 = network->addConvolutionNd(input, outch, DimsHW{ ksize, ksize }, weightMap[lname + ".conv.weight"], emptywts);
+    IConvolutionLayer* conv1 = network->addConvolution(input, outch, DimsHW{ ksize, ksize }, weightMap[lname + ".conv.weight"], emptywts);
     assert(conv1);
     conv1->setStrideNd(DimsHW{ s, s });
     conv1->setPaddingNd(DimsHW{ p, p });
@@ -199,13 +199,13 @@ ILayer* bottleneckCSP(INetworkDefinition *network, std::map<std::string, Weights
     Weights emptywts{ DataType::kFLOAT, nullptr, 0 };
     int c_ = (int)((float)c2 * e);
     auto cv1 = convBlock(network, weightMap, input, c_, 1, 1, 1, lname + ".cv1");
-    auto cv2 = network->addConvolutionNd(input, c_, DimsHW{ 1, 1 }, weightMap[lname + ".cv2.weight"], emptywts);
+    auto cv2 = network->addConvolution(input, c_, DimsHW{ 1, 1 }, weightMap[lname + ".cv2.weight"], emptywts);
     ITensor *y1 = cv1->getOutput(0);
     for (int i = 0; i < n; i++) {
         auto b = bottleneck(network, weightMap, *y1, c_, c_, shortcut, g, 1.0, lname + ".m." + std::to_string(i));
         y1 = b->getOutput(0);
     }
-    auto cv3 = network->addConvolutionNd(*y1, c_, DimsHW{ 1, 1 }, weightMap[lname + ".cv3.weight"], emptywts);
+    auto cv3 = network->addConvolution(*y1, c_, DimsHW{ 1, 1 }, weightMap[lname + ".cv3.weight"], emptywts);
 
     ITensor* inputTensors[] = { cv3->getOutput(0), cv2->getOutput(0) };
     auto cat = network->addConcatenation(inputTensors, 2);
