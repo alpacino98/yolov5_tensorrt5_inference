@@ -31,7 +31,7 @@ namespace Yolo
 
 namespace nvinfer1
 {
-    class YoloLayerPlugin : public IPluginV2IOExt
+    class YoloLayerPlugin : public IPluginV2
     {
     public:
         YoloLayerPlugin(int classCount, int netWidth, int netHeight, int maxOut, const std::vector<Yolo::YoloKernel>& vYoloKernel);
@@ -44,7 +44,9 @@ namespace nvinfer1
         }
 
         Dims getOutputDimensions(int index, const Dims* inputs, int nbInputDims) override;
-
+        
+       
+        //configureWithFormat
         int initialize() override;
 
         virtual void terminate() override {};
@@ -57,9 +59,12 @@ namespace nvinfer1
 
         virtual void serialize(void* buffer) const override;
 
-        bool supportsFormatCombination(int pos, const PluginTensorDesc* inOut, int nbInputs, int nbOutputs) const override {
-            return inOut[pos].format == TensorFormat::kLINEAR && inOut[pos].type == DataType::kFLOAT;
+        bool supportsFormat(nvinfer1::DataType type, nvinfer1::PluginFormat format) const override {
+            return format == nvinfer1::PluginFormat::kNCHW && type == nvinfer1::DataType::kFLOAT;
         }
+
+        void configureWithFormat(const nvinfer1::Dims *inputDims,int 	nbInputs,const nvinfer1::Dims *outputDims,
+                                    int nbOutputs,nvinfer1::DataType type,nvinfer1::PluginFormat format,int maxBatchSize) override;
 
         const char* getPluginType() const override;
 
@@ -67,24 +72,26 @@ namespace nvinfer1
 
         void destroy() override;
 
-        IPluginV2IOExt* clone() const override;
+        IPluginV2* clone() const override;
 
         void setPluginNamespace(const char* pluginNamespace) override;
 
         const char* getPluginNamespace() const override;
+        
 
-        DataType getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const override;
+        //Buranin alti yok
+        //DataType getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const override;
 
-        bool isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const override;
+        //bool isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const override;
 
-        bool canBroadcastInputAcrossBatch(int inputIndex) const override;
+        //bool canBroadcastInputAcrossBatch(int inputIndex) const override;
 
-        void attachToContext(
-            cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) override;
+        //void attachToContext(
+        //    cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) override;
 
-        void configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) override;
+        //void configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) override;
 
-        void detachFromContext() override;
+        //void detachFromContext() override;
 
     private:
         void forwardGpu(const float* const* inputs, float *output, cudaStream_t stream, int batchSize = 1);
@@ -112,9 +119,9 @@ namespace nvinfer1
 
         const PluginFieldCollection* getFieldNames() override;
 
-        IPluginV2IOExt* createPlugin(const char* name, const PluginFieldCollection* fc) override;
+        IPluginV2* createPlugin(const char* name, const PluginFieldCollection* fc) override;
 
-        IPluginV2IOExt* deserializePlugin(const char* name, const void* serialData, size_t serialLength) override;
+        IPluginV2* deserializePlugin(const char* name, const void* serialData, size_t serialLength) override;
 
         void setPluginNamespace(const char* libNamespace) override
         {

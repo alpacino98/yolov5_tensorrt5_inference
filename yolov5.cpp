@@ -5,7 +5,6 @@
 #include "logging.h"
 #include "common.hpp"
 #include "utils.h"
-#include "calibrator.h"
 
 #define USE_FP16  // set USE_INT8 or USE_FP16 or USE_FP32
 #define DEVICE 0  // GPU id
@@ -102,12 +101,6 @@ ICudaEngine* build_engine(unsigned int maxBatchSize, IBuilder* builder, IBuilder
     config->setMaxWorkspaceSize(16 * (1 << 20));  // 16MB
 #if defined(USE_FP16)
     config->setFlag(BuilderFlag::kFP16);
-#elif defined(USE_INT8)
-    std::cout << "Your platform support int8: " << (builder->platformHasFastInt8() ? "true" : "false") << std::endl;
-    assert(builder->platformHasFastInt8());
-    config->setFlag(BuilderFlag::kINT8);
-    Int8EntropyCalibrator2* calibrator = new Int8EntropyCalibrator2(1, INPUT_W, INPUT_H, "./coco_calib/", "int8calib.table", INPUT_BLOB_NAME);
-    config->setInt8Calibrator(calibrator);
 #endif
 
     std::cout << "Building engine, please wait for a while..." << std::endl;
@@ -207,12 +200,6 @@ ICudaEngine* build_engine_p6(unsigned int maxBatchSize, IBuilder* builder, IBuil
     config->setMaxWorkspaceSize(16 * (1 << 20));  // 16MB
 #if defined(USE_FP16)
     config->setFlag(BuilderFlag::kFP16);
-#elif defined(USE_INT8)
-    std::cout << "Your platform support int8: " << (builder->platformHasFastInt8() ? "true" : "false") << std::endl;
-    assert(builder->platformHasFastInt8());
-    config->setFlag(BuilderFlag::kINT8);
-    Int8EntropyCalibrator2* calibrator = new Int8EntropyCalibrator2(1, INPUT_W, INPUT_H, "./coco_calib/", "int8calib.table", INPUT_BLOB_NAME);
-    config->setInt8Calibrator(calibrator);
 #endif
 
     std::cout << "Building engine, please wait for a while..." << std::endl;
