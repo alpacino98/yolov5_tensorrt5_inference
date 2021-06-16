@@ -162,7 +162,7 @@ ILayer* convBlock(INetworkDefinition *network, std::map<std::string, Weights>& w
     IConvolutionLayer* conv1 = network->addConvolution(input, outch, DimsHW{ ksize, ksize }, weightMap[lname + ".conv.weight"], emptywts);
     assert(conv1);
     conv1->setStride(DimsHW{ s, s });
-    conv1->setPaddingNd(DimsHW{ p, p });
+    conv1->setPadding(DimsHW{ p, p });
     conv1->setNbGroups(g);
     IScaleLayer* bn1 = addBatchNorm2d(network, weightMap, *conv1->getOutput(0), lname + ".bn", 1e-3);
 
@@ -239,14 +239,14 @@ ILayer* SPP(INetworkDefinition *network, std::map<std::string, Weights>& weightM
     int c_ = c1 / 2;
     auto cv1 = convBlock(network, weightMap, input, c_, 1, 1, 1, lname + ".cv1");
 
-    auto pool1 = network->addPoolingNd(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k1, k1 });
-    pool1->setPaddingNd(DimsHW{ k1 / 2, k1 / 2 });
+    auto pool1 = network->addPooling(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k1, k1 });
+    pool1->setPadding(DimsHW{ k1 / 2, k1 / 2 });
     pool1->setStride(DimsHW{ 1, 1 });
-    auto pool2 = network->addPoolingNd(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k2, k2 });
-    pool2->setPaddingNd(DimsHW{ k2 / 2, k2 / 2 });
+    auto pool2 = network->addPooling(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k2, k2 });
+    pool2->setPadding(DimsHW{ k2 / 2, k2 / 2 });
     pool2->setStride(DimsHW{ 1, 1 });
-    auto pool3 = network->addPoolingNd(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k3, k3 });
-    pool3->setPaddingNd(DimsHW{ k3 / 2, k3 / 2 });
+    auto pool3 = network->addPooling(*cv1->getOutput(0), PoolingType::kMAX, DimsHW{ k3, k3 });
+    pool3->setPadding(DimsHW{ k3 / 2, k3 / 2 });
     pool3->setStride(DimsHW{ 1, 1 });
 
     ITensor* inputTensors[] = { cv1->getOutput(0), pool1->getOutput(0), pool2->getOutput(0), pool3->getOutput(0) };
