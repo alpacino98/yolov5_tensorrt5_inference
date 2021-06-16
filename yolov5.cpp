@@ -5,6 +5,7 @@
 #include "logging.h"
 #include "common.hpp"
 #include "utils.h"
+#include "NvInfer.h"
 
 #define USE_FP16  // set USE_INT8 or USE_FP16 or USE_FP32
 #define DEVICE 0  // GPU id
