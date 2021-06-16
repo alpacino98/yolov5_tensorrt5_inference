@@ -125,34 +125,43 @@ namespace nvinfer1
     }
 
     // Return the DataType of the plugin output at the requested index
+    /*
     DataType YoloLayerPlugin::getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const
     {
         return DataType::kFLOAT;
     }
+    */
 
     // Return true if output tensor is broadcast across a batch.
+    /*
     bool YoloLayerPlugin::isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const
     {
         return false;
     }
+    */
 
     // Return true if plugin can use input that is broadcast across batch without replication.
+    /*
     bool YoloLayerPlugin::canBroadcastInputAcrossBatch(int inputIndex) const
     {
         return false;
     }
-
+    */
+    /*
     void YoloLayerPlugin::configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput)
     {
     }
+    */
 
     // Attach the plugin object to an execution context and grant the plugin the access to some context resource.
+    /*
     void YoloLayerPlugin::attachToContext(cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator)
     {
     }
+    */
 
     // Detach the plugin object from its execution context.
-    void YoloLayerPlugin::detachFromContext() {}
+    //void YoloLayerPlugin::detachFromContext() {}
 
     const char* YoloLayerPlugin::getPluginType() const
     {

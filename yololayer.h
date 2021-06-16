@@ -59,9 +59,8 @@ namespace nvinfer1
 
         virtual void serialize(void* buffer) const override;
 
-        //Bura yok supportFormat var benzer
-        bool supportsFormatCombination(int pos, const PluginTensorDesc* inOut, int nbInputs, int nbOutputs) const override {
-            return inOut[pos].format == TensorFormat::kLINEAR && inOut[pos].type == DataType::kFLOAT;
+        bool supportsFormat(nvinfer1::DataType type, nvinfer1::PluginFormat format) const override {
+            return format == nvinfer1::PluginFormat::kNCHW && type == nvinfer1::DataType::kFLOAT;
         }
 
         const char* getPluginType() const override;
@@ -78,18 +77,18 @@ namespace nvinfer1
         
 
         //Buranin alti yok
-        DataType getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const override;
+        //DataType getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const override;
 
-        bool isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const override;
+        //bool isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const override;
 
-        bool canBroadcastInputAcrossBatch(int inputIndex) const override;
+        //bool canBroadcastInputAcrossBatch(int inputIndex) const override;
 
-        void attachToContext(
-            cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) override;
+        //void attachToContext(
+        //    cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) override;
 
-        void configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) override;
+        //void configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) override;
 
-        void detachFromContext() override;
+        //void detachFromContext() override;
 
     private:
         void forwardGpu(const float* const* inputs, float *output, cudaStream_t stream, int batchSize = 1);
