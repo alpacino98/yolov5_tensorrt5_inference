@@ -76,7 +76,14 @@
         // upsample11->setResizeMode(ResizeMode::kNEAREST);
         // upsample11->setOutputDimensions(bottleneck_csp6->getOutput(0)->getDimensions());
 
-        auto upsample11 = resizeNearest()
+        //Creating the resize plugin
+        auto creator = getPluginRegistry()->getPluginCreator("ResizeNearest_TRT", "1");
+        const PluginFieldCollection* pluginFC = creator->getFieldNames();
+        auto resizeLayer = creator->creatPlugin("resizeLayer0", pluginFC);
+        float scale_amount = float(bottleneck_csp6->getOutput(0)->getDimensions()[0]/conv10->getOutput(0)->getDimensions()[0]);
+        resizeLayer->ResizeNearest(scale_amount);
+        auto upsample11 = network.addPluginV2(conv10->getOutput(0), 1, resizeLayer);
+        //auto upsample11 = resizeLayer->enqueue(1, *conv10->getOutput(0), *bottleneck_csp4->getOutput(0), nullptr, )
 
         ITensor *inputTensors12[] = {upsample11->getOutput(0), bottleneck_csp6->getOutput(0)};
         auto cat12 = network->addConcatenation(inputTensors12, 2);
