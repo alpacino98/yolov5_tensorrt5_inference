@@ -21,16 +21,22 @@ link_directories(/usr/lib/x86_64-linux-gnu/)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Ofast -Wfatal-errors -D_MWAITXINTRIN_H_INCLUDED")
 
-cuda_add_library(myplugins SHARED ${PROJECT_SOURCE_DIR}/yololayer.cu ${PROJECT_SOURCE_DIR}/maskRCNNKernels.cu)
+cuda_add_library(myplugins SHARED ${PROJECT_SOURCE_DIR}/src/yololayer.cu ${PROJECT_SOURCE_DIR}/src/maskRCNNKernels.cu ${PROJECT_SOURCE_DIR}/src/resizeNearestPlugin.cpp)
 target_link_libraries(myplugins nvinfer cudart)
+
+file(GLOB_RECURSE yolov5_sources
+ ${PROJECT_SOURCE_DIR}/src/*.cpp)
+
+#file(GLOB SRC_FILES "./src/resizeNearestPlugin.cpp")
+add_library(resizeNearest SHARED ${PROJECT_SOURCE_DIR}/src/resizeNearestPlugin.cpp)
 
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-include_directories(resizeNearestPlugin)
-add_subdirectory(resizeNearestPlugin)
+#include_directories(resizeNearestPlugin)
+#add_subdirectory(resizeNearestPlugin)
 
-add_executable(yolov5 ${PROJECT_SOURCE_DIR}/yolov5.cpp)
+add_executable(yolov5 ${yolov5_sources})
 target_link_libraries(yolov5 nvinfer)
 target_link_libraries(yolov5 cudart)
 target_link_libraries(yolov5 myplugins)
